@@ -5,6 +5,7 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use shuttle_runtime::SecretStore;
 use tracing::{error, info};
+use serenity::utils::MessageBuilder;
 
 struct Bot;
 
@@ -14,9 +15,17 @@ impl EventHandler for Bot {
 
         //troll messages
         if msg.content == "int!hello" {
-            if let Err(e) = msg.channel_id.say(&ctx.http, "you, my dear sir, are a dirty inter").await {
-                error!("Error sending message: {:?}", e);
-            }
+            let channel = match msg.channel_id.to_channel(&context).await {
+                Ok(channel) => channel,
+                Err(why) => {
+                    println!("Error getting channel: {why:?}");
+                    return;
+                },
+            };
+            let response = MessageBuilder::new()
+                .push(&msg.author.name)
+                .push(", you are a dirty inter")
+                .build();
         }
         if msg.content == "int!gleb" {
             if let Err(e) = msg.channel_id.say(&ctx.http, "pepe laugh").await {
