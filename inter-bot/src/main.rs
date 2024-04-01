@@ -15,7 +15,7 @@ impl EventHandler for Bot {
 
         //troll messages
         if msg.content == "int!hello" {
-            let channel = match msg.channel_id.to_channel(&context).await {
+            let channel = match msg.channel_id.to_channel(&ctx).await {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {why:?}");
