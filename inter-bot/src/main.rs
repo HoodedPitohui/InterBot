@@ -11,8 +11,15 @@ struct Bot;
 #[async_trait]
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
+
+        //troll messages
         if msg.content == "int!hello" {
-            if let Err(e) = msg.channel_id.say(&ctx.http, "world!").await {
+            if let Err(e) = msg.channel_id.say(&ctx.http, "you, my dear sir, are a dirty inter").await {
+                error!("Error sending message: {:?}", e);
+            }
+        }
+        if msg.content == "int!gleb" {
+            if let Err(e) = msg.channel_id.say(&ctx.http, "pepe laugh").await {
                 error!("Error sending message: {:?}", e);
             }
         }
