@@ -1,11 +1,12 @@
 use anyhow::Context as _;
-use serenity::async_trait;
+use serenity::{async_trait, model};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use shuttle_runtime::SecretStore;
 use tracing::{error, info};
 use serenity::utils::MessageBuilder;
+use serenity::model::mention::Mention;
 
 struct Bot;
 
@@ -15,22 +16,19 @@ impl EventHandler for Bot {
 
         //troll messages
         if msg.content == "int!hello" {
-            let channel = match msg.channel_id.to_channel(&ctx).await {
-                Ok(channel) => channel,
-                Err(why) => {
-                    println!("Error getting channel: {why:?}");
-                    return;
-                },
-            };
-            let response = MessageBuilder::new()
-                .push(&msg.author.name)
-                .push(", you are a dirty inter")
-                .build();
+            let reply = format!("<@{}>, 0/0/0? Lol. And you call yourself \"challenger\"? 
+            Don't make me laugh.There's a reason Europe never wanted you. Because you're bad. 
+            Your silver fanboys might like you, but I'd fuck you up on the rift. 
+            I'm only plat and I already get much better scores. Drop your smug little smile, kid.", msg.author.id);
+            if let Err(why) = msg.channel_id.say(&ctx.http, &reply).await {
+                println!("Error sending message: {why:?}");
+            }
         }
         if msg.content == "int!gleb" {
-            if let Err(e) = msg.channel_id.say(&ctx.http, "pepe laugh").await {
+            if let Err(e) = msg.channel_id.say(&ctx.http, "<:pepeLaugh:798083157667610653>").await {
                 error!("Error sending message: {:?}", e);
             }
+            
         }
     }
 
