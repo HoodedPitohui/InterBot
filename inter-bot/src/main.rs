@@ -6,21 +6,24 @@ use serenity::prelude::*;
 use shuttle_runtime::SecretStore;
 use tracing::{error, info};
 use serenity::utils::MessageBuilder;
-use serenity::model::mention::Mention;
+use inter_bot::messages::messages::troll_messages;
 
 struct Bot;
 
 #[async_trait]
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
-
-        //troll messages
+        if msg.content == "int!help" {
+            let res_str = MessageBuilder::new() 
+                .push("The commands I currently have are: \n")
+                .build();
+            if let Err(why) = msg.channel_id.say(&ctx.http, &res_str).await {
+                println!("Error sending message: {why:?}");
+            }
+        }
+        //All the troll messages
         if msg.content == "int!hello" {
-            let reply = format!("<@{}>, 0/0/0? Lol. And you call yourself \"challenger\"? 
-            Don't make me laugh.There's a reason Europe never wanted you. Because you're bad. 
-            Your silver fanboys might like you, but I'd fuck you up on the rift. 
-            I'm only plat and I already get much better scores. Drop your smug little smile, kid.", msg.author.id);
-            if let Err(why) = msg.channel_id.say(&ctx.http, &reply).await {
+            if let Err(why) = msg.channel_id.say(&ctx.http, &troll_messages::hello_message(&msg)).await {
                 println!("Error sending message: {why:?}");
             }
         }
