@@ -6,14 +6,15 @@ use serenity::prelude::*;
 use shuttle_runtime::SecretStore;
 use tracing::{error, info};
 use serenity::utils::MessageBuilder;
-use inter_bot::messages::messages::troll_messages;
+use inter_bot::messages::troll_messages;
+use inter_bot::math;
 
 struct Bot;
 
 #[async_trait]
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content == "int!help" {
+        if msg.content.to_lowercase() == "int!help" {
             let res_str = MessageBuilder::new() 
                 .push("The commands I currently have are: \n")
                 .build();
@@ -22,16 +23,22 @@ impl EventHandler for Bot {
             }
         }
         //All the troll messages
-        if msg.content == "int!hello" {
+        if msg.content.to_lowercase() == "int!hello" {
             if let Err(why) = msg.channel_id.say(&ctx.http, &troll_messages::hello_message(&msg)).await {
                 println!("Error sending message: {why:?}");
             }
         }
-        if msg.content == "int!gleb" {
-            if let Err(e) = msg.channel_id.say(&ctx.http, "<:pepeLaugh:798083157667610653>").await {
+        if msg.content.to_lowercase() == "int!gleb" {
+            if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::gleb_message()).await {
                 error!("Error sending message: {:?}", e);
             }
-            
+        }
+        
+        //utility functions
+        if msg.content.to_lowercase() == "int!pemdas" {
+            if let Err(e) = msg.channel_id.say(&ctx.http, &math::pemdas(&msg)).await {
+                println!("Error sending message: {:?}", e);
+            }
         }
     }
 
