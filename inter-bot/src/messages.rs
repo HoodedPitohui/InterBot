@@ -9,6 +9,7 @@ pub mod troll_messages {
     }
     pub fn gleb_message() -> String {
         let reply = String::from("<:pepeLaugh:798083157667610653>");
+        println!("{}", reply);
         reply
     }
 }
