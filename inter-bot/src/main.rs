@@ -14,32 +14,38 @@ struct Bot;
 #[async_trait]
 impl EventHandler for Bot {
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.content.to_lowercase().contains("int!help") {
-            let res_str = MessageBuilder::new() 
-                .push("The commands I currently have are: \n")
-                .build();
-            if let Err(why) = msg.channel_id.say(&ctx.http, &res_str).await {
-                println!("Error sending message: {why:?}");
+        if msg.content.starts_with("int!") {
+            if msg.content.to_lowercase().contains("int!help") {
+                let res_str = MessageBuilder::new() 
+                    .push("The commands I currently have are: \n")
+                    .build();
+                if let Err(why) = msg.channel_id.say(&ctx.http, &res_str).await {
+                    println!("Error sending message: {why:?}");
+                }
             }
-        }
-        //All the troll messages
-        if msg.content.to_lowercase().contains("int!hello") {
-            if let Err(why) = msg.channel_id.say(&ctx.http, &troll_messages::hello_message(&msg)).await {
-                println!("Error sending message: {why:?}");
+            //All the troll messages
+            else if msg.content.to_lowercase().contains("int!hello") {
+                if let Err(why) = msg.channel_id.say(&ctx.http, &troll_messages::hello_message(&msg)).await {
+                    println!("Error sending message: {why:?}");
+                }
             }
-        }
-        if msg.content.to_lowercase().contains("int!gleb") {
-            if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::gleb_message()).await {
-                error!("Error sending message: {:?}", e);
+            else if msg.content.to_lowercase().contains("int!gleb") {
+                if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::gleb_message()).await {
+                    error!("Error sending message: {:?}", e);
+                }
             }
-        }
-        
-        //utility functions
-        if msg.content.to_lowercase().contains("int!pemdas") {
-            if let Err(e) = msg.channel_id.say(&ctx.http, &math::pemdas(&msg)).await {
-                println!("Error sending message: {:?}", e);
+            
+            //utility functions
+            else if msg.content.to_lowercase().contains("int!pemdas") {
+                if let Err(e) = msg.channel_id.say(&ctx.http, &math::pemdas(&msg)).await {
+                    println!("Error sending message: {:?}", e);
+                }
+            } else {
+                if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::king_troll_message(&msg)).await {
+                    println!("Error sending message: {:?}", e);
+                }
             }
-        }
+        }    
     }
 
     async fn ready(&self, _: Context, ready: Ready) {

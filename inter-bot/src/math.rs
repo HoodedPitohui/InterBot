@@ -32,6 +32,8 @@ fn parse_expression(expr: &str) -> Vec<Token> {
             num_buffer.clear();
         }
     };
+
+    //iterate through all of the characters
     for c in expr.chars() {
         match c {
             '0'..='9' | '.' => num_buffer.push(c),
@@ -48,7 +50,7 @@ fn parse_expression(expr: &str) -> Vec<Token> {
                 tokens.push(Token::RightParen);
             },
             ' ' => flush_num_buffer(&mut num_buffer, &mut tokens),
-            _ => (),
+            _ => (), //just do nothing
         }
     }
 
