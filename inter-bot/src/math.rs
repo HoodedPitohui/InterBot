@@ -1,5 +1,5 @@
 use serenity::model::channel::Message;
-
+use std::collections::VecDeque;
 enum Token {
     Number(f64),
     Operator(char),
@@ -16,7 +16,48 @@ pub fn pemdas(msg: &Message) -> String {
     //need spaces because otherwise sepax
     post = post.trim().to_string();
     let res = parse_expression(&post);
+
+    let mut output_queue: VecDeque<Token> = VecDeque::new();
+    let mut operator_stack: VecDeque<Token> = VecDeque::new();
+
+    let mut iter = 0;
+
+    for element in res {
+        match element {
+            Token::Number(_) => output_queue.push_front(element),
+            Token::Operator(temp_element) => {
+                let mut iter2 = 0;
+                while let Some(Token::Operator(top_element)) = operator_stack.back() {
+                    if (get_precedence(*top_element) > get_precedence(temp_element) || 
+                        (get_precedence(*top_element) == get_precedence(temp_element) && get_associativity(temp_element))) {
+                            output_queue.push_front(operator_stack.pop_back().unwrap());
+                        }
+                    else {
+                        break;
+                    }   
+                }
+                operator_stack.push_back(element);
+            }
+            Token::LeftParen => operator_stack.push_back(element),
+            Token::RightParen => operator_stack
+        }
+    }
     post
+}
+fn get_precedence(element: char) -> u8 {
+    match element {
+        '^' => 4,
+        '*' | '/' => 3,
+        '+' | '-' => 3,
+    }
+}
+
+fn get_associativity(element: char) -> bool {
+    match element {
+        '^' => false,
+        '*' | '/' => true,
+        '+' | '-' => true,
+    }
 }
 
 fn parse_expression(expr: &str) -> Vec<Token> {
