@@ -21,12 +21,10 @@ pub fn pemdas(msg: &Message) -> String {
     let mut operator_stack: VecDeque<Token> = VecDeque::new();
 
     let mut iter = 0;
-
     for element in res {
         match element {
             Token::Number(_) => output_queue.push_front(element),
             Token::Operator(temp_element) => {
-                let mut iter2 = 0;
                 while let Some(Token::Operator(top_element)) = operator_stack.back() {
                     if (get_precedence(*top_element) > get_precedence(temp_element) || 
                         (get_precedence(*top_element) == get_precedence(temp_element) && get_associativity(temp_element))) {
@@ -39,25 +37,66 @@ pub fn pemdas(msg: &Message) -> String {
                 operator_stack.push_back(element);
             }
             Token::LeftParen => operator_stack.push_back(element),
-            Token::RightParen => operator_stack
+            Token::RightParen => {
+                while let Some(element) = operator_stack.pop_back() {
+                    if let Token::LeftParen = element {
+                        break;
+                    } else {
+                        output_queue.push_front(element);
+                    }
+                }
+                //ignores functions
+            }
         }
     }
+
+    let fin_res = 0.0;
+    while let Some(element) = operator_stack.pop_back() {
+        output_queue.push_front(element);
+    }
+
+    let mut eval_stack: VecDeque<f64> = VecDeque::new();
+    for element in output_queue {
+        match element {
+            Token::Number(n) => eval_stack.push_back(n),
+            Token::Operator(element) => {
+                let right = eval_stack.pop_back().expect("Wrong syntax");
+                let left = eval_stack.pop_back().expect("Wrong syntax");
+                let result = match element {
+                    '+' => left + right,
+                    '-' => left - right,
+                    '*' => left * right,
+                    '/' => left / right,
+                    _ => 0.0,
+                };
+                eval_stack.push_back(result);
+            },
+            _ => (),
+        }
+    }
+    eval_stack.pop_back().expect("Invalid expression");
+    let final_result = String::from(eval_stack.pop_back().expect("Invalid expression").to_string());
     post
+    // final_result
 }
 fn get_precedence(element: char) -> u8 {
-    match element {
+    let var_name = match element {
         '^' => 4,
         '*' | '/' => 3,
         '+' | '-' => 3,
-    }
+        _ => 0,
+    };
+    var_name
 }
 
 fn get_associativity(element: char) -> bool {
-    match element {
+    let var_name = match element {
         '^' => false,
         '*' | '/' => true,
         '+' | '-' => true,
-    }
+        _ => false,
+    };
+    var_name
 }
 
 fn parse_expression(expr: &str) -> Vec<Token> {
