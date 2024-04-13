@@ -19,40 +19,36 @@ pub fn pemdas(msg: &Message) -> String {
 
     let mut output_queue: VecDeque<Token> = VecDeque::new();
     let mut operator_stack: VecDeque<Token> = VecDeque::new();
-
     let mut iter = 0;
     for element in res {
         match element {
-            Token::Number(_) => output_queue.push_front(element),
+            Token::Number(_) => output_queue.push_back(element),
             Token::Operator(temp_element) => {
                 while let Some(Token::Operator(top_element)) = operator_stack.back() {
-                    if (get_precedence(*top_element) > get_precedence(temp_element) || 
-                        (get_precedence(*top_element) == get_precedence(temp_element) && get_associativity(temp_element))) {
-                            output_queue.push_front(operator_stack.pop_back().unwrap());
-                        }
-                    else {
-                        break;
-                    }   
-                }
-                operator_stack.push_back(element);
-            }
-            Token::LeftParen => operator_stack.push_back(element),
-            Token::RightParen => {
-                while let Some(element) = operator_stack.pop_back() {
-                    if let Token::LeftParen = element {
-                        break;
+                    if get_precedence(*top_element) > get_precedence(temp_element) ||
+                       (get_precedence(*top_element) == get_precedence(temp_element) && !get_associativity(temp_element)) {
+                        output_queue.push_back(operator_stack.pop_back().unwrap());
                     } else {
-                        output_queue.push_front(element);
+                        break;
                     }
                 }
-                //ignores functions
+                operator_stack.push_back(element);
+            },
+            Token::LeftParen => operator_stack.push_back(element),
+            Token::RightParen => {
+                while let Some(top) = operator_stack.pop_back() {
+                    if let Token::LeftParen = top {
+                        break;
+                    } else {
+                        output_queue.push_back(top);
+                    }
+                }
             }
         }
     }
-
-    let fin_res = 0.0;
+    
     while let Some(element) = operator_stack.pop_back() {
-        output_queue.push_front(element);
+        output_queue.push_back(element);
     }
 
     let mut eval_stack: VecDeque<f64> = VecDeque::new();
@@ -74,16 +70,19 @@ pub fn pemdas(msg: &Message) -> String {
             _ => (),
         }
     }
-    eval_stack.pop_back().expect("Invalid expression");
+    // eval_stack.pop_back().expect("Invalid expression");
+
+    //there is probably an issue with this line of code
+    // return String::from(format!("length of eval stack: {}", eval_stack.len()));
     let final_result = String::from(eval_stack.pop_back().expect("Invalid expression").to_string());
-    post
+    final_result
     // final_result
 }
 fn get_precedence(element: char) -> u8 {
     let var_name = match element {
         '^' => 4,
         '*' | '/' => 3,
-        '+' | '-' => 3,
+        '+' | '-' => 2,
         _ => 0,
     };
     var_name
