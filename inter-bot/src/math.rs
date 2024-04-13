@@ -63,6 +63,7 @@ pub fn pemdas(msg: &Message) -> String {
                     '-' => left - right,
                     '*' => left * right,
                     '/' => left / right,
+                    '^' => left.powf(right),
                     _ => 0.0,
                 };
                 eval_stack.push_back(result);
@@ -116,7 +117,7 @@ fn parse_expression(expr: &str) -> Vec<Token> {
     for c in expr.chars() {
         match c {
             '0'..='9' | '.' => num_buffer.push(c),
-            '+' | '-' | '*' | '/' => {
+            '+' | '-' | '*' | '/' | '^' => {
                 flush_num_buffer(&mut num_buffer, &mut tokens);
                 tokens.push(Token::Operator(c));
             },
