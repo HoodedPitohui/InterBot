@@ -8,6 +8,9 @@ use tracing::{error, info};
 use serenity::utils::MessageBuilder;
 use inter_bot::messages::troll_messages;
 use inter_bot::math;
+use serenity::model::guild::Guild;
+use serenity::model::id::GuildId;
+
 
 struct Bot;
 
@@ -32,6 +35,16 @@ impl EventHandler for Bot {
             else if msg.content.to_lowercase().contains("int!gleb") {
                 if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::gleb_message()).await {
                     error!("Error sending message: {:?}", e);
+                }
+            } 
+            else if msg.content.to_lowercase().contains("int!pepespam") {
+                if let Some(guild_id) = msg.guild_id {
+                    if let Some(guild) = ctx.cache.guild(guild_id).await {
+                             
+                        if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::pepe_spam(&guild)).await {
+                            error!("Error sending message: {:?}", e);
+                        }
+                    }
                 }
             }
             
@@ -63,7 +76,12 @@ async fn serenity(
         .context("'DISCORD_TOKEN' was not found")?;
 
     // Set gateway intents, which decides what events the bot will be notified about
-    let intents = GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT;
+    let intents = GatewayIntents::GUILD_MESSAGES 
+        | GatewayIntents::MESSAGE_CONTENT
+        | GatewayIntents::GUILDS 
+        | GatewayIntents::GUILD_EMOJIS_AND_STICKERS
+        | GatewayIntents::DIRECT_MESSAGES 
+        | GatewayIntents::GUILD_MEMBERS;
 
     let client = Client::builder(&token, intents)
         .event_handler(Bot)

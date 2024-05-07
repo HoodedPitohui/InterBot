@@ -1,5 +1,7 @@
 pub mod troll_messages {
     use serenity::model::channel::Message;
+    use serenity::model::guild::Guild;
+
     use rand::Rng;
     pub fn hello_message(msg: &Message) -> String {
         let reply = format!("<@{}>, 0/0/0? Lol. And you call yourself \"challenger\"? 
@@ -15,6 +17,17 @@ pub mod troll_messages {
         println!("{}", reply);
         reply
     }
+    pub fn pepe_spam(guild: &Guild) -> String {
+
+        //find the emojis that have pepe in it on the server
+        let emotes = &guild.emojis;
+        for (_key, value) in emotes {
+            let emoji_val = value;
+            return emoji_val.name.clone();
+        }
+        return String::from("hello");
+    }
+
     pub fn king_troll_message(msg: &Message) -> String {
         //return a massively troll message
         let mut post: String = msg.content.chars().skip(4).collect();
