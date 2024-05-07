@@ -24,26 +24,16 @@ pub mod troll_messages {
         println!("{}", reply);
         reply
     }
-    pub fn pepe_spam(guild: &Guild) -> String {
 
-        //find the emojis that have pepe in it on the server
-        let emotes = &guild.emojis;
-        for (_key, value) in emotes {
-            let emoji_val = value;
-            return emoji_val.name.clone();
-        }
-        return String::from("hello");
-    }
-
-    pub async fn pepe_spam2(guild_id: &GuildId, http: &Http) -> String {
+    pub async fn pepe_spam(guild_id: &GuildId, http: &Http) -> String {
         let emotes = match guild_id.emojis(&http).await {
             Ok(emojis) => emojis,
             Err(e) => return String::from("no emotes found"),
         };
     
         // Check if there are any emojis and extract the first one's name
-        let first_emote = &emotes[0];
-        let reply = first_emote.name.clone();
+        let first_emote = &emotes[8];
+        let reply = format!("<:{}:{}>", first_emote.name.clone(), first_emote.id.to_string());
         reply
     }
 
