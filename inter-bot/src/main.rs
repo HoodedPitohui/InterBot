@@ -42,13 +42,16 @@ impl EventHandler for Bot {
                 }
             } 
             else if msg.content.to_lowercase().contains("int!pepespam") {
+                // if let Some(guild_id) = msg.guild_id {
+                //     if let Ok(guild) = guild_id.to_guild_cached(&ctx.cache) {
+                //         if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::pepe_spam(&guild)).await {
+                //             error!("Error sending message: {:?}", e);
+                //         }
+                //     }
+                // }
                 if let Some(guild_id) = msg.guild_id {
-                    if let Some(temp_guild) = ctx.cache.guild(guild_id) {
-                        tokio::spawn(async move {
-                            if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::pepe_spam(&*temp_guild)).await {
-                                error!("Error sending message: {:?}", e);
-                            }
-                        });
+                    if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::pepe_spam2(&guild_id, &ctx.http).await).await {
+                        error!("Error sending message: {:?}", e);
                     }
                 }
             }

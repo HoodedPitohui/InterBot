@@ -4,6 +4,10 @@ pub mod troll_messages {
     use serenity::model::guild::Guild;
     use serenity::model::id::GuildId;
     use serenity::http::Http;
+    use anyhow::Context as _;
+    use std::sync::Arc;
+
+
 
     use rand::Rng;
     pub fn hello_message(msg: &Message) -> String {
@@ -29,6 +33,18 @@ pub mod troll_messages {
             return emoji_val.name.clone();
         }
         return String::from("hello");
+    }
+
+    pub async fn pepe_spam2(guild_id: &GuildId, http: &Http) -> String {
+        let emotes = match guild_id.emojis(&http).await {
+            Ok(emojis) => emojis,
+            Err(e) => return String::from("no emotes found"),
+        };
+    
+        // Check if there are any emojis and extract the first one's name
+        let first_emote = &emotes[0];
+        let reply = first_emote.name.clone();
+        reply
     }
 
     pub fn king_troll_message(msg: &Message) -> String {
