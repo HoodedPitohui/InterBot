@@ -1,6 +1,9 @@
 pub mod troll_messages {
+    use serenity::http;
     use serenity::model::channel::Message;
     use serenity::model::guild::Guild;
+    use serenity::model::id::GuildId;
+    use serenity::http::Http;
 
     use rand::Rng;
     pub fn hello_message(msg: &Message) -> String {
