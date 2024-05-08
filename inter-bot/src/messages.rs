@@ -123,6 +123,46 @@ pub mod troll_messages {
         reply
     }
 
+    //8ball
+    pub fn eight_ball(msg: &Message) -> String {
+        let last_char;
+        if let Some(char) = msg.content.to_string().chars().last() {
+            last_char = char;
+        } 
+        else {
+            return String::from("You have given me nothing!");
+        }
+
+        if last_char != '?' {
+            return String::from("You have not given me a question!!!");
+        }
+
+        let responses = vec!["It is certain",
+                                        "It is decidedly so",
+                                        "Without a doubt",
+                                        "Yes definitely",
+                                        "You may rely on it",
+                                        "As I see it, yes",
+                                        "Most likely",
+                                        "Outlook good",
+                                        "Yes",
+                                        "Signs point to yes",
+                                        "Reply hazy, try again",
+                                        "Ask again later",
+                                        "Better not tell you now",
+                                        "Cannot predict now",
+                                        "Concentrate and ask again",
+                                        "Don't count on it",
+                                        "My reply is no",
+                                        "My sources say no",
+                                        "Outlook not so good",
+                                        "Very doubtful"];
+        let mut rng = rand::thread_rng();
+        let num = rng.gen_range(0..responses.len());
+        let reply = responses[num].to_string();
+        reply
+    }
+
     pub fn king_troll_message(msg: &Message) -> String {
         //return a massively troll message
         let mut post: String = msg.content.chars().skip(4).collect();

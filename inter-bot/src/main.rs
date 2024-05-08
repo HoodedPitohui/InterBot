@@ -51,6 +51,11 @@ impl EventHandler for Bot {
                     }
                 }
             }
+            else if msg.content.to_lowercase().contains("int!8ball") {
+                if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::eight_ball(&msg)).await {
+                    error!("Error sending message: {:?}", e);
+                }
+            }
             
             //utility functions
             else if msg.content.to_lowercase().contains("int!pemdas") {
