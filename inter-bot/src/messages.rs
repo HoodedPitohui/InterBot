@@ -31,9 +31,31 @@ pub mod troll_messages {
             Err(e) => return String::from("no emotes found"),
         };
     
-        // Check if there are any emojis and extract the first one's name
-        let first_emote = &emotes[8];
-        let reply = format!("<:{}:{}>", first_emote.name.clone(), first_emote.id.to_string());
+        
+        //find the pepe emotes -> need name and id
+        let mut pepe_names = Vec::new();
+        let mut pepe_ids = Vec::new();
+
+        //search all of the emotes -> time intensive and might need to be optimized later
+        for emo in &emotes {
+            if emo.name.to_lowercase().contains("pepe") 
+                || emo.name.to_lowercase().contains("peep") 
+                || emo.name.to_lowercase().contains("eege") {
+                pepe_names.push(emo.name.clone());
+                pepe_ids.push(emo.id.to_string());
+            }
+        }
+        let mut reply = String::new();
+
+        //fencepost so that there is no trailing line
+        for e in 0..pepe_names.len() - 1 {
+            let add_string = format!("<:{}:{}> \n", pepe_names[e], pepe_ids[e]);
+            reply.push_str(&add_string);
+        }
+        let add_string = format!("<:{}:{}>", pepe_names[pepe_names.len() - 1], pepe_ids[pepe_names.len() - 1]);
+        reply.push_str(&add_string);
+
+        //return reply
         reply
     }
 
