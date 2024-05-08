@@ -24,7 +24,6 @@ pub fn pemdas(msg: &Message) -> String {
 
     //operators not added to the output queue
     let mut operator_stack: VecDeque<Token> = VecDeque::new();
-    let mut iter = 0;
     for element in res {
         match element {
 

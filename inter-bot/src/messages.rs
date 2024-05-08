@@ -1,11 +1,8 @@
 pub mod troll_messages {
-    use serenity::http;
     use serenity::model::channel::Message;
-    use serenity::model::guild::Guild;
     use serenity::model::id::GuildId;
     use serenity::http::Http;
-    use anyhow::Context as _;
-    use std::sync::Arc;
+    use serenity::model::id::UserId;
 
 
 
@@ -28,7 +25,7 @@ pub mod troll_messages {
     pub async fn pepe_spam(guild_id: &GuildId, http: &Http) -> String {
         let emotes = match guild_id.emojis(&http).await {
             Ok(emojis) => emojis,
-            Err(e) => return String::from("no emotes found"),
+            Err(_e) => return String::from("no emotes found"),
         };
     
         
@@ -56,6 +53,73 @@ pub mod troll_messages {
         reply.push_str(&add_string);
 
         //return reply
+        reply
+    }
+    
+    pub async fn ping_spam(msg: &Message, guild_id: &GuildId, http: &Http) -> String {
+        //this is supposed to let users to specify a username, and then a number
+        //the bot will then ping the user that many times
+        let post: String = msg.content.chars().skip(12).collect();
+        let parts = post.trim().split(" ");
+        let part_vec = parts.collect::<Vec<&str>>();
+
+        //check if there are more than two arguments entered
+        //otherwise default to 10 pings
+        let mut pings = 10;
+        if part_vec.len() > 2 {
+            return String::from("You have entered in too many arguments!");
+        }
+
+        //0 arguments after = not viable ping
+        else if part_vec.len() == 0 {
+            return String::from("You have not given me a user to ping!");
+        }
+
+        //this means that a number of pings has been specified = 2nd position
+        else if part_vec.len() == 2 {
+            //make sure it's an integer
+            let num = part_vec[1].to_string().parse::<i64>();
+            match num {
+                Ok(_val) => pings = num.unwrap(),
+                Err(_why) => return String::from("You have not entered in an integer number of pings!"),
+            }
+        }
+
+        let mut reply = String::new();
+
+        if pings > 50 {
+            pings = 50;
+            let add_string = String::from("I can send a maximum of 50 pings at once!");
+            reply.push_str(&add_string);
+        }
+
+
+        //check if the first part does have a viable ping
+        let mut user_id: Vec<_> = part_vec[0].to_string().chars().skip(2).collect();
+
+        //last letter should be >
+        let last_char = part_vec[0].to_string().chars().last().unwrap(); //this should always work        
+        user_id = user_id[0..user_id.len() - last_char.len_utf8()].to_vec();
+        
+        let user_f64 = match user_id.into_iter().collect::<String>().parse::<u64>() {
+            Ok(user_f64) => user_f64,
+            Err(_e) => return String::from("A viable user was not found")
+        };
+
+        //create ping id
+        let ping_id = UserId::new(user_f64);
+
+        //check if user is in server
+        let _ping_member = match guild_id.member(&http, ping_id).await {
+            Ok(ping_member) => ping_member,
+            Err(_e) => return String::from("This person is not in the server!"),
+        };  
+
+        //viable user found
+        for _p in 0..pings {
+            let add_str = format!("<@!{}> ", user_f64);
+            reply.push_str(&add_str);
+        }
         reply
     }
 

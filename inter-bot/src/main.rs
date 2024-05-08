@@ -3,18 +3,12 @@ use serenity::{async_trait, model};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
+use serenity::utils::MessageBuilder;
+
 use shuttle_runtime::SecretStore;
 use tracing::{error, info};
-use serenity::utils::MessageBuilder;
 use inter_bot::messages::troll_messages;
 use inter_bot::math;
-
-use serenity::model::guild::Guild;
-use serenity::model::id::GuildId;
-use std::sync::Arc;
-use serenity::cache::GuildRef;
-
-
 
 struct Bot;
 
@@ -45,6 +39,14 @@ impl EventHandler for Bot {
 
                 if let Some(guild_id) = msg.guild_id {
                     if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::pepe_spam(&guild_id, &ctx.http).await).await {
+                        error!("Error sending message: {:?}", e);
+                    }
+                }
+            }
+
+            else if msg.content.to_lowercase().contains("int!pingspam") {
+                if let Some(guild_id) = msg.guild_id {
+                    if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::ping_spam(&msg, &guild_id, &ctx.http).await).await {
                         error!("Error sending message: {:?}", e);
                     }
                 }
