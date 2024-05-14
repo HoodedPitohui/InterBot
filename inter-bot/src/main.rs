@@ -8,7 +8,8 @@ use serenity::utils::MessageBuilder;
 use shuttle_runtime::SecretStore;
 use tracing::{error, info};
 use inter_bot::messages::troll_messages;
-use inter_bot::math;
+use inter_bot::{info, math};
+use inter_bot::reddit;
 
 struct Bot;
 
@@ -58,6 +59,11 @@ impl EventHandler for Bot {
             }
             
             //utility functions
+            else if msg.content.to_lowercase().contains("int!rust") {
+                if let Err(e) = msg.channel_id.say(&ctx.http, &info::rust_info().await).await {
+                    error!("Error sending message: {:?}", e);
+                }
+            }
             else if msg.content.to_lowercase().contains("int!pemdas") {
                 if let Err(e) = msg.channel_id.say(&ctx.http, &math::pemdas(&msg)).await {
                     println!("Error sending message: {:?}", e);

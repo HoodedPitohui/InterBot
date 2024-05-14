@@ -37,7 +37,9 @@ pub mod troll_messages {
         for emo in &emotes {
             if emo.name.to_lowercase().contains("pepe") 
                 || emo.name.to_lowercase().contains("peep") 
-                || emo.name.to_lowercase().contains("eege") {
+                || emo.name.to_lowercase().ends_with("ge") 
+                // || emo.name.to_lowercase().contains("poggers") doesn't work for some reason
+                {
                 pepe_names.push(emo.name.clone());
                 pepe_ids.push(emo.id.to_string());
             }
