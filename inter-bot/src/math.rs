@@ -1,5 +1,13 @@
 use serenity::model::channel::Message;
 use std::collections::VecDeque;
+use reqwest::{Client, Error};
+use serde::{Deserialize, Serialize};
+
+struct ApiResponse {
+    name: String,
+    value: i32,
+}
+
 enum Token {
     Number(f64),
     Operator(char),
@@ -168,4 +176,39 @@ fn parse_expression(expr: &str) -> Vec<Token> {
 
     flush_num_buffer(&mut num_buffer, &mut tokens);
     tokens
+}
+
+//Wolfram API integration
+//Credit to Andrey Piterkin for original .js implementation
+
+pub async fn wolfram(msg: &Message) -> String {
+
+    //skip the int!wolfram part and get the body of the message
+    let mut query: String = msg.content.chars().skip(11).collect();
+
+    //uses full results API from Wolfram
+    let client = Client::new();
+
+    //hide in secrets -> later
+    let client_id = "2YKYP9-3K29Q854UA";
+
+    let mut api_call = String::from("https://api.wolframalpha.com/v2/query?input=");
+    api_call.push_str(&query);
+    let suffix = String::from("&format=plaintext&output=JSON&appid=");
+    api_call.push_str(&suffix);
+    api_call.push_str(&client_id);
+
+    let res = match client.get(api_call).send().await {
+        Ok(received) => {
+            let json_in = received.json::<ApiResponse>().await;
+            match json_in {
+                Ok(content) => content,
+                Err(_) => return String::from("Could not process the API call"),
+            }
+        },
+        Err(_) => return String::from("Could not get a result from the API Call"),
+    };
+        
+    String::from("test")
+
 }

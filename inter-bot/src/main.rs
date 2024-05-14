@@ -56,14 +56,19 @@ impl EventHandler for Bot {
                 if let Err(e) = msg.channel_id.say(&ctx.http, &troll_messages::eight_ball(&msg)).await {
                     error!("Error sending message: {:?}", e);
                 }
-            }
-            
+            }           
             //utility functions
+            else if msg.content.to_lowercase().contains("int!wolfram") {
+                if let Err(e) = msg.channel_id.say(&ctx.http, &math::wolfram(&msg).await).await {
+                    error!("Error sending message: {:?}", e);
+                }
+            }
             else if msg.content.to_lowercase().contains("int!rust") {
                 if let Err(e) = msg.channel_id.say(&ctx.http, &info::rust_info().await).await {
                     error!("Error sending message: {:?}", e);
                 }
             }
+
             else if msg.content.to_lowercase().contains("int!pemdas") {
                 if let Err(e) = msg.channel_id.say(&ctx.http, &math::pemdas(&msg)).await {
                     println!("Error sending message: {:?}", e);
