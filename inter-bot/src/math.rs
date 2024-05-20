@@ -198,17 +198,33 @@ pub async fn wolfram(msg: &Message) -> String {
     api_call.push_str(&suffix);
     api_call.push_str(&client_id);
 
-    let res = match client.get(api_call).send().await {
+
+    let res = match client.get(&api_call).send().await {
         Ok(received) => {
-            let json_in = received.json::<ApiResponse>().await;
+            let json_in = received.json::<serde_json::Value>().await;
             match json_in {
                 Ok(content) => content,
-                Err(_) => return String::from("Could not process the API call"),
+                Err(_) => return "Could not process the API call".to_string(),
             }
         },
-        Err(_) => return String::from("Could not get a result from the API Call"),
+        Err(_) => return "Could not get a result from the API Call".to_string(),
     };
-        
-    String::from("test")
+
+    res["queryresult"]["pods"]
+        .as_array()
+        .and_then(|pods| {
+            pods.first()
+                .and_then(|first_pod| {
+                    first_pod["subpods"]
+                        .as_array()
+                        .and_then(|subpods| {
+                            subpods.first()
+                                .and_then(|first_subpod| {
+                                    first_subpod["img"]["src"].as_str().map(|s| s.to_string())
+                                })
+                        })
+                })
+        })
+        .unwrap_or_else(|| "Image not found".to_string())
 
 }
